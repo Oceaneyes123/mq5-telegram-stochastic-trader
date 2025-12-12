@@ -111,6 +111,35 @@ async def webhook_from_mt5(request: Request):
 
     return JSONResponse(content=response_content)
 
+
+@app.get("/result")
+async def get_last_result():
+    """Return the last payload written to result.json.
+
+    This is useful for quickly checking what the MT5 webhook last sent.
+    """
+    result_path = Path(__file__).with_name("result.json")
+
+    if not result_path.exists():
+        return JSONResponse(
+            status_code=404,
+            content={"status": "not_found", "detail": "result.json does not exist yet"},
+        )
+
+    try:
+        raw = result_path.read_text(encoding="utf-8")
+        data = json.loads(raw)
+    except Exception as exc:  # pragma: no cover - defensive
+        return JSONResponse(
+            status_code=500,
+            content={
+                "status": "invalid_result_json",
+                "detail": str(exc),
+            },
+        )
+
+    return JSONResponse(content=data)
+
 """FastAPI application entrypoint.
 
 On Render, make sure the server binds to 0.0.0.0 and uses the
