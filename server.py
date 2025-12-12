@@ -3,10 +3,12 @@ from fastapi.responses import JSONResponse
 import json
 from datetime import datetime
 from pathlib import Path
+import os
 
 import re
 
 import anyio
+import uvicorn
 
 app = FastAPI()
 
@@ -109,5 +111,21 @@ async def webhook_from_mt5(request: Request):
 
     return JSONResponse(content=response_content)
 
-# Run with:
-# uvicorn server:app --host 0.0.0.0 --port 8000
+"""FastAPI application entrypoint.
+
+On Render, make sure the server binds to 0.0.0.0 and uses the
+PORT environment variable exposed by the platform.
+
+Recommended Render start command (in the Render dashboard):
+
+    uvicorn server:app --host 0.0.0.0 --port $PORT
+
+You can also run it directly via Python (useful for local testing):
+
+    python server.py
+"""
+
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", "10000"))
+    uvicorn.run("server:app", host="0.0.0.0", port=port)
