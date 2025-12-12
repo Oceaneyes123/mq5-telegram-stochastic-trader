@@ -140,6 +140,11 @@ async def get_last_result():
 
     return JSONResponse(content=data)
 
+
+@app.get("/hello")
+async def hello_world():
+    return JSONResponse(content={"message": "Hello World"})
+
 """FastAPI application entrypoint.
 
 On Render, make sure the server binds to 0.0.0.0 and uses the
